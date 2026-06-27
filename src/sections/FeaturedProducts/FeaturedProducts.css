@@ -1,0 +1,31 @@
+.featured-products {
+  
+  background: rgb(19, 6, 83);
+}
+
+.featured-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.featured-header h2 {
+  font-size:30px;
+  color: #eff0f4;
+  margin-right: 1200px;
+
+}
+
+.featured-header p {
+  color: #e4e6e8;
+  margin-right: 1200px;
+}
+
+.products-grid {
+  max-width: 1400px;
+  margin: auto;
+  display: grid;
+  grid-template-columns:
+    repeat(auto-fit, minmax(280px, 1fr));
+
+  gap: 25px;
+}

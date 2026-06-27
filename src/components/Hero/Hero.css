@@ -1,0 +1,189 @@
+.hero{
+    background: linear-gradient(
+        135deg,
+        #020817,
+        #0b1f52,
+        #102b7a
+    );
+
+    min-height: 650px;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero::before{
+    content:"";
+    position:absolute;
+    inset:0;
+
+    background-image:
+    linear-gradient(
+        rgba(255,255,255,0.04) 1px,
+        transparent 1px
+    ),
+    linear-gradient(
+        90deg,
+        rgba(255,255,255,0.04) 1px,
+        transparent 1px
+    );
+
+    background-size:60px 60px;
+}
+
+.hero-container{
+    width:80%;
+    margin:auto;
+    min-height:650px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    position:relative;
+    z-index:2;
+}
+
+.hero-left{
+    width:40%;
+}
+
+.sale-badge{
+    display:inline-block;
+
+    padding:12px 20px;
+
+    border-radius:40px;
+
+    border:1px solid #2563eb;
+
+    color:#60a5fa;
+
+    margin-bottom:25px;
+
+    font-size:10px;
+}
+
+.hero-left h1{
+    color:white;
+    font-size:60px;
+    line-height:1.1;
+    font-weight:800;
+}
+
+.hero-left span{
+    color:#38bdf8;
+    display:block;
+}
+
+.hero-left p{
+    color:#cbd5e1;
+    font-size:22px;
+    line-height:1.8;
+
+    margin-top:25px;
+    margin-bottom:35px;
+}
+
+.hero-buttons{
+    display:flex;
+    gap:20px;
+}
+
+.shop-btn{
+    background:#2563eb;
+    color:white;
+
+    border:none;
+
+    padding:18px 35px;
+
+    border-radius:15px;
+
+    font-size:15px;
+    cursor:pointer;
+}
+
+.deal-btn{
+    background:transparent;
+
+    border:1px solid #64748b;
+
+    color:white;
+
+    padding:18px 35px;
+
+    border-radius:14px;
+
+    font-size:15px;
+    cursor:pointer;
+}
+
+.hero-right{
+    width:30%;
+    display:flex;
+    justify-content:center;
+}
+
+.image-card{
+    position:relative;
+}
+
+.image-card img{
+    width:90%;
+    max-width:500px;
+
+    border-radius:30px;
+
+    background:white;
+}
+
+.price-tag{
+    position:absolute;
+
+    bottom:-25px;
+    right:-25px;
+
+    background:#2563eb;
+
+    padding:20px;
+
+    border-radius:20px;
+
+    color:white;
+}
+
+.price-tag span{
+    font-size:15px;
+}
+
+.price-tag h3{
+    font-size:18px;
+    margin-top:5px;
+}
+
+@media(max-width:992px){
+
+.hero-container{
+    flex-direction:column;
+    text-align:center;
+    padding:50px 0;
+}
+
+.hero-left{
+    width:100%;
+}
+
+.hero-right{
+    width:100%;
+    margin-top:40px;
+}
+
+.hero-left h1{
+    font-size:55px;
+}
+
+.hero-buttons{
+    justify-content:center;
+}
+
+}

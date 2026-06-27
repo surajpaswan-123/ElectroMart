@@ -1,0 +1,199 @@
+.product-details {
+  padding: 80px 25px;
+  background: #f8fafc;
+}
+
+.product-container {
+  max-width: 1400px;
+  margin: auto;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  gap: 50px;
+
+  background: white;
+
+  padding: 40px;
+
+  border-radius: 20px;
+
+  box-shadow:
+    0 10px 25px rgba(0,0,0,.08);
+}
+
+.product-image-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-product-image {
+  width: 100%;
+  max-width: 500px;
+
+  border-radius: 20px;
+}
+
+.product-category {
+  display: inline-block;
+
+  background: #dbeafe;
+
+  color: #2563eb;
+
+  padding: 8px 15px;
+
+  border-radius: 30px;
+
+  margin-bottom: 15px;
+}
+
+.product-info h1 {
+  font-size: 42px;
+
+  color: #0f172a;
+
+  margin-bottom: 20px;
+}
+
+.rating-box {
+  display: flex;
+  align-items: center;
+
+  gap: 5px;
+
+  color: #f59e0b;
+
+  margin-bottom: 20px;
+}
+
+.rating-box span {
+  color: #64748b;
+  margin-left: 10px;
+}
+
+.price-section {
+  margin-bottom: 25px;
+}
+
+.current-price {
+  font-size: 36px;
+  font-weight: 700;
+
+  color: #2563eb;
+
+  margin-right: 15px;
+}
+
+.old-price {
+  text-decoration: line-through;
+  color: #94a3b8;
+}
+
+.product-description {
+  color: #64748b;
+
+  line-height: 1.8;
+
+  margin-bottom: 30px;
+}
+
+.quantity-wrapper {
+  display: flex;
+  align-items: center;
+
+  gap: 15px;
+
+  margin-bottom: 30px;
+}
+
+.quantity-wrapper button {
+  width: 40px;
+  height: 40px;
+
+  border: none;
+
+  background: #2563eb;
+
+  color: white;
+
+  border-radius: 8px;
+
+  cursor: pointer;
+}
+
+.quantity-wrapper span {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 15px;
+}
+
+.add-cart-btn,
+.wishlist-btn-details {
+  border: none;
+
+  padding: 15px 25px;
+
+  border-radius: 10px;
+
+  cursor: pointer;
+
+  font-size: 15px;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-cart-btn {
+  background: #2563eb;
+  color: white;
+}
+
+.wishlist-btn-details {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.description-section {
+  max-width: 1400px;
+  margin: 50px auto 0;
+
+  background: white;
+
+  padding: 40px;
+
+  border-radius: 20px;
+}
+
+.description-section h2 {
+  margin-bottom: 20px;
+  color: #0f172a;
+}
+
+.description-section p {
+  color: #64748b;
+  line-height: 1.8;
+}
+
+@media(max-width:900px){
+
+  .product-container{
+    grid-template-columns:1fr;
+  }
+
+  .product-info h1{
+    font-size:32px;
+  }
+
+  .action-buttons{
+    flex-direction:column;
+  }
+
+}

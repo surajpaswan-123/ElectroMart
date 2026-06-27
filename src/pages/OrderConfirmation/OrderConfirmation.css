@@ -1,0 +1,47 @@
+.order-confirmation {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #f5f7fa;
+}
+
+.confirmation-card {
+  background: white;
+  padding: 50px;
+  border-radius: 15px;
+  text-align: center;
+  width: 600px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.success-icon {
+  font-size: 70px;
+  margin-bottom: 20px;
+}
+
+.confirmation-card h1 {
+  margin-bottom: 15px;
+}
+
+.order-id {
+  margin: 25px 0;
+  font-size: 22px;
+  font-weight: bold;
+  color: #2563eb;
+}
+
+.confirmation-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.continue-btn,
+.orders-btn {
+  text-decoration: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: white;
+  background: #2563eb;
+}

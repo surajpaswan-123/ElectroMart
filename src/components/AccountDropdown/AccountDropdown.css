@@ -1,0 +1,70 @@
+/* Keep styles consistent with existing dark navbar */
+.acc-wrap{position:relative; display:flex; align-items:center;}
+
+.acc-btn{
+  background:transparent;
+  border:none;
+  color:#94a3b8;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:12px;
+  padding:10px 10px;
+}
+
+.acc-btn-text{max-width:120px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+.acc-chevron{transition:transform .15s ease;}
+.acc-chevron.open{transform:rotate(180deg);}
+
+.acc-menu{
+  position:absolute;
+  top:46px;
+  right:0;
+  width:280px;
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 12px 30px rgba(0,0,0,.15);
+  overflow:hidden;
+  z-index:9999;
+  animation:accFade .18s ease;
+}
+
+@keyframes accFade{
+  from{opacity:0; transform:translateY(-8px)}
+  to{opacity:1; transform:translateY(0)}
+}
+
+.acc-label{
+  padding:14px 18px;
+  font-weight:900;
+  color:#111827;
+  border-bottom:1px solid #eee;
+}
+
+.acc-item{
+  width:100%;
+  padding:12px 18px;
+  border:none;
+  background:#fff;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-align:left;
+  color:#111827;
+  font-weight:700;
+}
+
+.acc-item:hover{background:#f5f5f5; color:#2563eb;}
+
+.acc-item.danger{color:#dc2626;}
+.acc-item.danger:hover{background:#fef2f2;}
+
+.acc-item-icon{display:flex; align-items:center;}
+
+@media (max-width:768px){
+  .acc-menu{right:-10px; width:240px;}
+}
+
