@@ -6,7 +6,7 @@ const API_BASE_URL =
   "http://localhost:8091";
 
 const API = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: " https://electromart-backend-w5kf.onrender.com.",
 });
 
 API.interceptors.request.use((config) => {
