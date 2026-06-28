@@ -1,4 +1,11 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  useCallback
+} from "react";
 import { useNavigate } from "react-router-dom";
 
 const AuthContext = createContext(null);
@@ -46,43 +53,40 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
 
-  const login = (userObj) => {
-    const normalized = normalizeUser(userObj);
+  const login = useCallback((userObj) => {
+  const normalized = normalizeUser(userObj);
 
-    setUser(normalized);
+  setUser(normalized);
 
-    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(normalized));
+  localStorage.setItem(
+    AUTH_STORAGE_KEY,
+    JSON.stringify(normalized)
+  );
 
-    // Login ke baad Home page
-    navigate("/", { replace: true });
-  };
+  navigate("/", { replace: true });
 
-  const logout = () => {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-    localStorage.removeItem("token");
+}, [navigate]);
 
-    setUser(null);
+  const logout = useCallback(() => {
 
-    // Browser history me protected pages nahi rahenge
-    navigate("/login", { replace: true });
-  };
+  localStorage.removeItem(AUTH_STORAGE_KEY);
+  localStorage.removeItem("token");
 
-  const value = useMemo(() => {
-    return {
-      user,
-      isAuthenticated: !!user,
-      loading,
-      login,
-      logout,
-    };
-  }, [user, loading]);
+  setUser(null);
 
+  navigate("/login", {
+    replace: true,
+  });
 
+}, [navigate]);
 
-
-
-
-
+ const value = useMemo(() => ({
+  user,
+  isAuthenticated: !!user,
+  loading,
+  login,
+  logout,
+}), [user, loading, login, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
