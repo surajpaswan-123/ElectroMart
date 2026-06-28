@@ -63,7 +63,7 @@ function ProductQuickView({
                 disabled={isAdded}
                 onClick={() => onAddToCart(product)}
               >
-                <FaShoppingCart />
+          
                 {isAdded ? "Added ✓" : "Add"}
               </button>
 

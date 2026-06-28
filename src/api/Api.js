@@ -6,8 +6,13 @@ const API_BASE_URL =
   "http://localhost:8091";
 
 const API = axios.create({
-  baseURL: " https://electromart-backend-w5kf.onrender.com.",
+  baseURL: (process.env.REACT_APP_API_URL || API_BASE_URL)
+    .trim()
+    .replace(/\/+$/, ""),
 });
+
+
+
 
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");

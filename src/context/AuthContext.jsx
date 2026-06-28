@@ -46,33 +46,27 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
 
- const login = (userObj) => {
-  const normalized = normalizeUser(userObj);
+  const login = (userObj) => {
+    const normalized = normalizeUser(userObj);
 
-  setUser(normalized);
+    setUser(normalized);
 
-  localStorage.setItem(
-    AUTH_STORAGE_KEY,
-    JSON.stringify(normalized)
-  );
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(normalized));
 
-  // Login ke baad Home page
-  navigate("/", { replace: true });
-};
+    // Login ke baad Home page
+    navigate("/", { replace: true });
+  };
 
- const logout = () => {
+  const logout = () => {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem("token");
 
-  localStorage.removeItem(AUTH_STORAGE_KEY);
-  localStorage.removeItem("token");
+    setUser(null);
 
-  setUser(null);
+    // Browser history me protected pages nahi rahenge
+    navigate("/login", { replace: true });
+  };
 
-  // Browser history me protected pages nahi rahenge
-  navigate("/login", {
-    replace: true,
-  });
-
-};
   const value = useMemo(() => {
     return {
       user,
@@ -81,7 +75,10 @@ export const AuthProvider = ({ children }) => {
       login,
       logout,
     };
-  }, [user, loading, login, logout]);
+  }, [user, loading]);
+
+
+
 
 
 
