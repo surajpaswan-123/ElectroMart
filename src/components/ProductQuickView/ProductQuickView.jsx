@@ -1,5 +1,5 @@
 import React from "react";
-import { FaShoppingCart, FaHeart, FaStar } from "react-icons/fa";
+//import { FaShoppingCart, FaHeart, FaStar } from "react-icons/fa";
 import "./ProductQuickView.css";
 
 function ProductQuickView({
@@ -85,6 +85,5 @@ function ProductQuickView({
     </div>
   );
 }
-
 export default ProductQuickView;
 

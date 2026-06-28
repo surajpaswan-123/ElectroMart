@@ -8,13 +8,12 @@ import {
   FaBars,
   FaTimes,
   FaHeart,
-  FaUser,
   FaBolt,
 } from "react-icons/fa";
 
 import { useCart } from "../../context/CartContext";
 import AccountDropdown from "../AccountDropdown/AccountDropdown";
-import { AuthProvider } from "../../context/AuthContext";
+//import { AuthProvider } from "../../context/AuthContext";
 
 import "./Navbar.css";
 
@@ -26,7 +25,7 @@ function Navbar() {
 
   const [search, setSearch] =    useState("");
 
-  const [showAccountMenu, setShowAccountMenu] = useState(false);
+  //const [showAccountMenu, setShowAccountMenu] = useState(false);
 
 
   const { cartItems } = useCart();

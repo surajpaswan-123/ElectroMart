@@ -4,7 +4,6 @@ import {
   ChevronDown,
   LogIn,
   User,
-  ShoppingBag,
   Heart,
   Truck,
   Settings,
