@@ -183,3 +183,9 @@
   .mo-action{ min-width: 140px; }
 }
 
+@media (max-width: 480px){
+  .mo-header h1{ font-size: 30px; }
+  .mo-action{ min-width: 100%; }
+}
+
+

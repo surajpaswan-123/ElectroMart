@@ -1,9 +1,10 @@
 .checkout-page {
-  padding: 80px 25px;
+  padding: clamp(50px, 8vh, 80px) clamp(14px, 3.5vw, 25px);
   background: #f8fafc;
-
+  
   min-height: 100vh;
 }
+
 
 .checkout-header {
   text-align: center;

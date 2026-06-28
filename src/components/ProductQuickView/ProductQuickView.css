@@ -204,3 +204,12 @@
   .pv-image-wrap img{max-width:360px;}
 }
 
+@media (max-width: 480px){
+  .pv-modal{ border-radius: 12px; }
+  .pv-image-wrap{ padding: 12px; }
+  .pv-image-wrap img{ max-width: 320px; }
+  .pv-content{ padding: 16px; }
+  .pv-actions--quick{ flex-direction: column; }
+}
+
+
