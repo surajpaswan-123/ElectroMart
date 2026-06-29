@@ -11,9 +11,10 @@
   padding: 50px;
   border-radius: 15px;
   text-align: center;
-  width: 600px;
+  width: min(600px, calc(100vw - 24px));
   box-shadow: 0 5px 20px rgba(0,0,0,0.1);
 }
+
 
 .success-icon {
   font-size: 70px;

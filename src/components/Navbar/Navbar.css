@@ -255,9 +255,13 @@
     font-size: 18px;
   }
   .category-nav {
-    overflow-x: auto;
-    white-space: nowrap;
+    /* No horizontal scrolling on mobile */
+    overflow-x: visible;
+    white-space: normal;
+    flex-wrap: wrap;
+    gap: 12px;
   }
+
 }
 
 

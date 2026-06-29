@@ -56,12 +56,24 @@
     border-radius:30px;
 }
 
-.products-grid{
+  .products-grid{
     display:grid;
-    grid-template-columns:
-    repeat(auto-fit,minmax(260px,1fr));
+    grid-template-columns: 1fr;
     gap:24px;
 }
+
+@media (min-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1200px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 
 .no-products {
   text-align: center;
