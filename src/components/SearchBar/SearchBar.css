@@ -5,6 +5,12 @@
 }
 
 
+@media (max-width: 480px) {
+  .search-bar {
+    max-width: 100%;
+  }
+}
+
 .search-bar input {
   width: 100%;
   padding: 12px 15px 12px 45px;
@@ -25,3 +31,4 @@
   transform: translateY(-50%);
   color: #777;
 }
+

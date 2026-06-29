@@ -1,4 +1,4 @@
-.product-details {
+  .product-details {
   padding: clamp(50px, 8vh, 80px) clamp(14px, 3.5vw, 25px);
   background: #f8fafc;
 }
@@ -198,3 +198,29 @@
   }
 
 }
+
+@media (max-width: 480px) {
+  .current-price {
+    font-size: 28px;
+    margin-right: 10px;
+  }
+
+  .product-info h1 {
+    font-size: 28px;
+  }
+
+  .action-buttons {
+    gap: 10px;
+  }
+
+  .add-cart-btn,
+  .wishlist-btn-details {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .buy-now-btn {
+    width: 100%;
+  }
+}
+

@@ -11,16 +11,26 @@
 .featured-header h2 {
   font-size:30px;
   color: #eff0f4;
-  margin-right: 1200px;
-
+  margin-right: 0;
 }
 
 .featured-header p {
   color: #e4e6e8;
-  margin-right: 1200px;
+  margin-right: 0;
+}
+
+/* Keep header text safely within viewport on very small screens */
+@media (max-width: 480px) {
+  .featured-header {
+    padding: 0 12px;
+  }
+  .featured-header h2 {
+    font-size: 24px;
+  }
 }
 
 .products-grid {
+
   max-width: 1400px;
   margin: auto;
   display: grid;

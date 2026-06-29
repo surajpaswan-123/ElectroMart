@@ -22,7 +22,7 @@
   position:absolute;
   top:46px;
   right:0;
-  width:280px;
+  width: min(280px, calc(100vw - 24px));
   background:#fff;
   border-radius:12px;
   box-shadow:0 12px 30px rgba(0,0,0,.15);
@@ -65,6 +65,6 @@
 .acc-item-icon{display:flex; align-items:center;}
 
 @media (max-width:768px){
-  .acc-menu{right:-10px; width:240px;}
+  .acc-menu{right:0; width: min(240px, calc(100vw - 24px));}
 }
 

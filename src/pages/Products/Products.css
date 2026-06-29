@@ -87,5 +87,12 @@
         align-items:flex-start;
         gap: 14px;
     }
+
+    /* Prevent sidebar/input row from forcing horizontal overflow */
+    .products-layout{
+      gap: 20px;
+    }
 }
+
+
 
