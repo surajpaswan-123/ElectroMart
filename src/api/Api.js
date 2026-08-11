@@ -1,10 +1,5 @@
 import axios from "axios";
-
-const API_BASE_URL =
-  process.env.REACT_APP_API_BASE_URL ||
-  process.env.REACT_APP_BACKEND_URL ||
-  "http://localhost:8091";
-
+  const API_BASE_URL = "https://electromart-backend-w5kf.onrender.com";
 const API = axios.create({
   baseURL: (process.env.REACT_APP_API_URL || API_BASE_URL)
     .trim()
