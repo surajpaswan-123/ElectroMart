@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import API from "../api/Api";
+import "./Login/Login.css";
 
 function VerifyOTP() {
   const navigate = useNavigate();
   const location = useLocation();
-  const email = location.state?.email || "";
-
+  const [email, setEmail] = useState(location.state?.email || sessionStorage.getItem("electromart_pending_email") || "");
   const [otp, setOtp] = useState("");
   const [countdown, setCountdown] = useState(60);
   const [loading, setLoading] = useState(false);
@@ -15,9 +15,15 @@ function VerifyOTP() {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    if (!email) {
-      setError("Missing email. Please register again.");
+    const stateEmail = location.state?.email;
+    if (stateEmail) {
+      setEmail(stateEmail);
+      sessionStorage.setItem("electromart_pending_email", stateEmail);
     }
+  }, [location.state]);
+
+  useEffect(() => {
+    if (!email) setError("Missing email. Please register again.");
   }, [email]);
 
   useEffect(() => {
@@ -26,30 +32,28 @@ function VerifyOTP() {
     return () => clearInterval(timer);
   }, [countdown]);
 
+  const getMessage = (err, fallback) => {
+    const data = err?.response?.data;
+    if (typeof data === "string") return data;
+    return data?.message || err?.message || fallback;
+  };
+
   const handleVerify = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
-    if (!email) {
-      setError("Missing email. Please register again.");
-      return;
-    }
-
     const cleanOtp = otp.trim();
-    if (!/^\d{6}$/.test(cleanOtp)) {
-      setError("Enter a valid 6-digit OTP");
-      return;
-    }
+    if (!email) return setError("Missing email. Please register again.");
+    if (!/^\d{6}$/.test(cleanOtp)) return setError("Enter a valid 6-digit OTP");
 
     setLoading(true);
     try {
       await API.post("/api/auth/verify-otp", { email, otp: cleanOtp });
+      sessionStorage.removeItem("electromart_pending_email");
       setSuccess("Email verified successfully. Redirecting to login...");
-      setTimeout(() => navigate("/login", { replace: true }), 800);
+      setTimeout(() => navigate("/login", { replace: true }), 900);
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.response?.data || err?.message;
-      setError(typeof msg === "string" ? msg : "OTP verification failed");
+      setError(getMessage(err, "OTP verification failed"));
     } finally {
       setLoading(false);
     }
@@ -58,21 +62,17 @@ function VerifyOTP() {
   const handleResend = async () => {
     setError("");
     setSuccess("");
-    if (!email) {
-      setError("Missing email. Please register again.");
-      return;
-    }
+    if (!email) return setError("Missing email. Please register again.");
     if (countdown > 0 || resending) return;
 
     setResending(true);
     try {
       await API.post("/api/auth/resend-otp", { email });
-      setSuccess("New OTP sent to your email");
       setOtp("");
       setCountdown(60);
+      setSuccess("New OTP sent. Check your inbox.");
     } catch (err) {
-      const msg = err?.response?.data?.message || err?.response?.data || err?.message;
-      setError(typeof msg === "string" ? msg : "Failed to resend OTP");
+      setError(getMessage(err, "Failed to resend OTP"));
     } finally {
       setResending(false);
     }
@@ -80,26 +80,30 @@ function VerifyOTP() {
 
   return (
     <div className="auth-page">
-      <div className="auth-card">
+      <div className="auth-card otp-card">
         <div className="logo"><div className="logo-icon">⚡</div><h2>Electro<span>Mart</span></h2></div>
+        <div className="otp-icon">✉</div>
         <h1>Verify your email</h1>
-        <p className="subtitle">Enter the 6-digit code sent to your email.</p>
-        {error ? <p style={{ color: "#dc2626", marginBottom: 12 }}>{error}</p> : null}
-        {success ? <p style={{ color: "#16a34a", marginBottom: 12 }}>{success}</p> : null}
+        <p className="subtitle">We sent a 6-digit verification code to:</p>
+        <div className="otp-email">{email || "your email address"}</div>
+        {error && <div className="auth-message error-message">{error}</div>}
+        {success && <div className="auth-message success-message">{success}</div>}
 
         <form className="auth-form" onSubmit={handleVerify}>
-          <div className="input-box">
-            <input type="text" inputMode="numeric" maxLength={6} placeholder="Enter 6-digit OTP" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))} required />
+          <label className="otp-label" htmlFor="otp">Verification code</label>
+          <div className="input-box otp-input-box">
+            <input id="otp" type="text" inputMode="numeric" autoComplete="one-time-code" maxLength={6} placeholder="000000" value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))} required autoFocus />
           </div>
-          <button type="submit" className="primary-btn" disabled={loading}>
+          <button type="submit" className="primary-btn" disabled={loading || !email}>
             {loading ? "Verifying..." : "Verify OTP →"}
           </button>
         </form>
 
         <div className="divider"><span>Didn't get the code?</span></div>
-        <button type="button" className="primary-btn" style={{ background: "#0f172a" }} onClick={handleResend} disabled={resending || countdown > 0 || !email}>
-          {resending ? "Resending..." : countdown > 0 ? `Resend OTP (${countdown}s)` : "Resend OTP"}
+        <button type="button" className="resend-btn" onClick={handleResend} disabled={resending || countdown > 0 || !email}>
+          {resending ? "Sending..." : countdown > 0 ? `Resend OTP in ${countdown}s` : "Resend OTP"}
         </button>
+        <button type="button" className="back-login-btn" onClick={() => navigate("/login")}>Back to Login</button>
       </div>
     </div>
   );
