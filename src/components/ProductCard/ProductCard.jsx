@@ -28,6 +28,7 @@ function ProductCard({
   const navigate = useNavigate();
 const [wishlisted, setWishlisted] = useState(false);
   const [quickViewOpen, setQuickViewOpen] = React.useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   const product = {
     id,
@@ -74,13 +75,11 @@ const [wishlisted, setWishlisted] = useState(false);
 
       }
 
-      await API.post("/api/wishlist/add", null, {
-        params: {
-          productId: id,
-        },
+      const res = await API.post("/api/wishlist/toggle", null, {
+        params: { productId: id },
       });
 
-      setWishlisted(true);
+      setWishlisted(Boolean(res.data));
 
     } catch (err) {
 
@@ -135,9 +134,9 @@ const [wishlisted, setWishlisted] = useState(false);
           <button
             className={`cart-btn1 ${isAdded ? "added" : ""}`}
             disabled={isAdded}
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              addToCart({
+              await addToCart({
                 id,
                 brand,
                 title,
@@ -152,16 +151,16 @@ const [wishlisted, setWishlisted] = useState(false);
 
           <button
             className="buy-now-btn"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.stopPropagation();
-              buyNow({
+              const added = await buyNow({
                 id,
                 brand,
                 title,
                 image,
                 price,
               });
-              navigate("/checkout");
+              if (added) navigate("/checkout");
             }}
           >
             Buy Now
