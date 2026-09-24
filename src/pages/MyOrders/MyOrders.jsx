@@ -21,9 +21,9 @@ const STATUS_STYLES = {
     className: "mo-badge mo-badge--shipped",
   },
 
-  Delivered: {
-    className: "mo-badge mo-badge--delivered",
-  },
+  OUT_FOR_DELIVERY: { className: "mo-badge mo-badge--shipped" },
+  DELIVERED: { className: "mo-badge mo-badge--delivered" },
+  CANCELLED: { className: "mo-badge mo-badge--cancelled" },
 };
 function MyOrders() {
   const navigate = useNavigate();
@@ -200,10 +200,7 @@ function MyOrders() {
                     <button
                       className="mo-action mo-action--track"
                       type="button"
-                      onClick={() => {
-                        // Hook for tracking page
-                        navigate("/order-confirmation");
-                      }}
+                      onClick={() => navigate("/order-confirmation", { state: { order: order.raw } })}
                     >
                       <FaTruck />
                       Track Order
@@ -212,10 +209,7 @@ function MyOrders() {
                     <button
                       className="mo-action mo-action--details"
                       type="button"
-                      onClick={() => {
-                        // Hook for details page
-                        navigate("/order-confirmation");
-                      }}
+                      onClick={() => navigate("/order-confirmation", { state: { order: order.raw } })}
                     >
                       <FaEye />
                       View Details
