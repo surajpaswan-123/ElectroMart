@@ -66,8 +66,10 @@ export default function Login() {
     setLoading(true);
     try {
       await API.post("/api/auth/register", { name: cleanName, email: cleanEmail, password: signupPassword });
-      sessionStorage.setItem("electromart_pending_email", cleanEmail);
-      navigate("/verify-otp", { state: { email: cleanEmail } });
+      setActiveTab("signin");
+      setEmail(cleanEmail);
+      setPassword("");
+      setError("Account created successfully. Please sign in.");
     } catch (error) {
       setError(messageFromError(error, "Registration failed"));
     } finally {
@@ -101,13 +103,13 @@ export default function Login() {
         ) : (
           <>
             <h1>Join ElectroMart</h1>
-            <p className="subtitle">Create an account and verify your email with OTP.</p>
+            <p className="subtitle">Create an account with your email and password.</p>
             <form className="auth-form" onSubmit={handleRegister}>
               <div className="input-box"><input type="text" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required autoComplete="name" /></div>
               <div className="input-box"><FaEnvelope /><input type="email" placeholder="john@example.com" value={signupEmail} onChange={(e) => setSignupEmail(e.target.value)} required autoComplete="email" /></div>
               <div className="input-box password-box"><FaLock /><input type={showSignupPassword ? "text" : "password"} placeholder="Password" value={signupPassword} onChange={(e) => setSignupPassword(e.target.value)} required minLength={6} autoComplete="new-password" /><button type="button" className="password-toggle" onClick={() => setShowSignupPassword((v) => !v)} aria-label={showSignupPassword ? "Hide password" : "Show password"}>{showSignupPassword ? <FaEyeSlash /> : <FaEye />}</button></div>
               <div className="input-box password-box"><FaLock /><input type={showConfirmPassword ? "text" : "password"} placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={6} autoComplete="new-password" /><button type="button" className="password-toggle" onClick={() => setShowConfirmPassword((v) => !v)} aria-label={showConfirmPassword ? "Hide password" : "Show password"}>{showConfirmPassword ? <FaEyeSlash /> : <FaEye />}</button></div>
-              <button type="submit" className="primary-btn" disabled={loading}>{loading ? "Sending OTP..." : "Create Account →"}</button>
+              <button type="submit" className="primary-btn" disabled={loading}>{loading ? "Creating Account..." : "Create Account →"}</button>
             </form>
           </>
         )}
