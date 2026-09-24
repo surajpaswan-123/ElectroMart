@@ -18,6 +18,10 @@ function Checkout() {
   });
 
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [coupon, setCoupon] = useState(null);
+  const [couponMessage, setCouponMessage] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -25,6 +29,33 @@ function Checkout() {
       [e.target.name]: e.target.value,
     });
   };
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim() || couponLoading) return;
+    setCouponLoading(true);
+    setCouponMessage("");
+    try {
+      const res = await API.post("/api/coupons/apply", { code: couponCode.trim() });
+      setCoupon(res.data);
+      setCouponMessage(res.data.message || "Coupon applied");
+    } catch (err) {
+      setCoupon(null);
+      setCouponMessage(err?.response?.data?.message || "Invalid coupon");
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setCoupon(null);
+    setCouponCode("");
+    setCouponMessage("");
+  };
+
+  const subtotal = cartItems.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0);
+  const shipping = cartItems.length ? 20 : 0;
+  const discount = Number(coupon?.discountAmount || 0);
+  const payableTotal = Math.max(0, subtotal + shipping - discount);
 
   const handlePlaceOrder = async (e) => {
     e.preventDefault();
@@ -70,7 +101,9 @@ const orderItems = cartItems.map((item) => ({
         email: formData.email,
         phone: formData.phone,
         address: formData.address,
-        totalAmount,
+        totalAmount: payableTotal,
+        couponCode: coupon?.code || null,
+        discountAmount: discount,
         paymentMethod: formData.paymentMethod,
         orderStatus: "PLACED",
         orderItems,
@@ -210,6 +243,24 @@ const orderItems = cartItems.map((item) => ({
         <div className="order-summary">
   <h2>Order Summary</h2>
 
+  <div className="coupon-box">
+    <input
+      type="text"
+      value={couponCode}
+      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+      placeholder="Coupon code"
+      disabled={Boolean(coupon)}
+    />
+    {coupon ? (
+      <button type="button" onClick={removeCoupon}>Remove</button>
+    ) : (
+      <button type="button" onClick={applyCoupon} disabled={couponLoading}>
+        {couponLoading ? "Applying..." : "Apply"}
+      </button>
+    )}
+    {couponMessage && <small>{couponMessage}</small>}
+  </div>
+
   {cartItems.map((item) => (
     <div
       className="summary-item"
@@ -227,24 +278,21 @@ const orderItems = cartItems.map((item) => ({
 
   <div className="summary-item">
     <span>Shipping</span>
-    <span>₹20</span>
+    <span>₹{shipping.toFixed(2)}</span>
   </div>
+
+  {discount > 0 && (
+    <div className="summary-item">
+      <span>Coupon Discount</span>
+      <span>-₹{discount.toFixed(2)}</span>
+    </div>
+  )}
 
   <hr />
 
   <div className="summary-total">
     <span>Total</span>
-
-    <span>
-      ₹
-      {(
-        cartItems.reduce(
-          (sum, item) =>
-            sum + item.price * item.quantity,
-          0
-        ) + 20
-      ).toFixed(2)}
-    </span>
+    <span>₹{payableTotal.toFixed(2)}</span>
   </div>
 </div>    
       </div>

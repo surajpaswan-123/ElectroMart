@@ -14,25 +14,37 @@ function Cart() {
     increaseQty,
     decreaseQty,
     removeItem,
+    clearCart,
+    cartLoading,
+    cartError,
+    cartSubtotal,
   } = useCart();
 
   const navigate = useNavigate();
 
-  const subtotal = cartItems.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0
-  );
+  const subtotal = cartSubtotal;
 
   const shipping = cartItems.length ? 20 : 0;
   const tax = cartItems.length ? 50 : 0;
   const total = subtotal + shipping + tax;
+
+  if (cartLoading) {
+    return (
+      <section className="cart-page">
+        <div className="cart-header">
+          <h1>Shopping Cart</h1>
+          <p>Loading your cart...</p>
+        </div>
+      </section>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (
       <section className="cart-page">
         <div className="cart-header">
           <h1>Shopping Cart</h1>
-          <p>Your cart is empty.</p>
+          <p>{cartError || "Your cart is empty."}</p>
         </div>
       </section>
     );
@@ -48,6 +60,8 @@ function Cart() {
       <div className="cart-container">
 
         <div className="cart-items">
+          {cartError && <p role="alert">{cartError}</p>}
+          <button type="button" onClick={clearCart}>Clear Cart</button>
 
           {cartItems.map((item) => (
 
