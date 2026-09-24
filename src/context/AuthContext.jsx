@@ -4,91 +4,95 @@ import React, {
   useEffect,
   useMemo,
   useState,
-  useCallback
+  useCallback,
 } from "react";
+import { useAuth as useClerkAuth, useUser } from "@clerk/react";
 import { useNavigate } from "react-router-dom";
+import API from "../api/Api";
 
 const AuthContext = createContext(null);
-
 export const useAuth = () => useContext(AuthContext);
 
 const AUTH_STORAGE_KEY = "user";
 
-const normalizeUser = (u) => {
-  if (!u) return null;
-  if (typeof u === "string") {
+export const AuthProvider = ({ children }) => {
+  const navigate = useNavigate();
+  const { isSignedIn, getToken, signOut } = useClerkAuth();
+  const { user: clerkUser } = useUser();
+  const [user, setUser] = useState(() => {
     try {
-      return JSON.parse(u);
+      return JSON.parse(localStorage.getItem(AUTH_STORAGE_KEY) || "null");
     } catch {
       return null;
     }
-  }
-  return u;
-};
-
-export const AuthProvider = ({ children }) => {
-  const navigate = useNavigate();
-
-  const [user, setUser] = useState(null);
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const rawUser = localStorage.getItem(AUTH_STORAGE_KEY);
-    const parsedUser = normalizeUser(rawUser);
+    window.__clerkGetToken = getToken;
+    return () => {
+      delete window.__clerkGetToken;
+    };
+  }, [getToken]);
 
-    // If we have a token but no stored user, keep auth state consistent by using a minimal user stub.
-    // ProtectedRoute relies on AuthContext state.
-    const token = localStorage.getItem("token");
-
-    if (parsedUser) {
-      setUser(parsedUser);
-    } else if (token) {
-      // Minimal placeholder to prevent redirect loops on refresh.
-      setUser({ email: "", name: "" });
-    } else {
+  const syncUser = useCallback(async () => {
+    if (!isSignedIn || !clerkUser) {
       setUser(null);
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+      setLoading(false);
+      return;
     }
 
-    setLoading(false);
-  }, []);
+    try {
+      const primaryEmail =
+        clerkUser.primaryEmailAddress?.emailAddress ||
+        clerkUser.emailAddresses?.[0]?.emailAddress ||
+        "";
 
+      const response = await API.post("/api/auth/clerk/sync", {
+        name: clerkUser.fullName || clerkUser.firstName || "ElectroMart User",
+        email: primaryEmail,
+      });
 
-  const login = useCallback((userObj) => {
-  const normalized = normalizeUser(userObj);
+      const localUser = response.data;
+      setUser(localUser);
+      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(localUser));
+    } catch (error) {
+      console.error("Clerk user sync failed:", error);
+      setUser(null);
+      localStorage.removeItem(AUTH_STORAGE_KEY);
+    } finally {
+      setLoading(false);
+    }
+  }, [isSignedIn, clerkUser]);
 
-  setUser(normalized);
+  useEffect(() => {
+    setLoading(true);
+    syncUser();
+  }, [syncUser]);
 
-  localStorage.setItem(
-    AUTH_STORAGE_KEY,
-    JSON.stringify(normalized)
+  const login = useCallback(() => {
+    navigate("/", { replace: true });
+  }, [navigate]);
+
+  const logout = useCallback(async () => {
+    await signOut();
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+    localStorage.removeItem("token");
+    setUser(null);
+    navigate("/login", { replace: true });
+  }, [navigate, signOut]);
+
+  const value = useMemo(
+    () => ({
+      user,
+      isAuthenticated: !!isSignedIn && !!user,
+      loading,
+      login,
+      logout,
+    }),
+    [user, isSignedIn, loading, login, logout]
   );
-
-  navigate("/", { replace: true });
-
-}, [navigate]);
-
-  const logout = useCallback(() => {
-
-  localStorage.removeItem(AUTH_STORAGE_KEY);
-  localStorage.removeItem("token");
-
-  setUser(null);
-
-  navigate("/login", {
-    replace: true,
-  });
-
-}, [navigate]);
-
- const value = useMemo(() => ({
-  user,
-  isAuthenticated: !!user,
-  loading,
-  login,
-  logout,
-}), [user, loading, login, logout]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
-
-
