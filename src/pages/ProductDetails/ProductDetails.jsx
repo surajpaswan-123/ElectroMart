@@ -11,6 +11,13 @@ function ProductDetails() {
 
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
+  const [reviews, setReviews] = useState([]);
+  const [myReview, setMyReview] = useState(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewLoading, setReviewLoading] = useState(false);
 
   const { addToCart, buyNow } = useCart();
 
@@ -25,6 +32,46 @@ function ProductDetails() {
         setProduct(null);
       });
   }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    API.get(`/api/wishlist/check/${id}`)
+      .then((res) => setWishlisted(Boolean(res.data)))
+      .catch(() => setWishlisted(false));
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    API.get(`/api/products/${id}/reviews`).then((res) => setReviews(res.data || [])).catch(() => setReviews([]));
+    API.get(`/api/products/${id}/reviews/mine`).then((res) => {
+      if (res.status === 200 && res.data) {
+        setMyReview(res.data);
+        setReviewRating(res.data.rating);
+        setReviewComment(res.data.comment || "");
+      }
+    }).catch(() => setMyReview(null));
+  }, [id]);
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+    if (!reviewComment.trim() || reviewLoading) return;
+    setReviewLoading(true);
+    try {
+      const res = await API.post(`/api/products/${id}/reviews`, {
+        rating: reviewRating,
+        comment: reviewComment.trim(),
+      });
+      setMyReview(res.data);
+      setReviews((items) => [res.data, ...items.filter((item) => item.id !== res.data.id)]);
+      setReviewComment(res.data.comment || "");
+      const productRes = await API.get(`/api/products/${id}`);
+      setProduct(productRes.data);
+    } catch (error) {
+      console.error("Failed to submit review:", error);
+    } finally {
+      setReviewLoading(false);
+    }
+  };
 
   const increaseQty = () => {
     setQuantity((q) => q + 1);
@@ -50,14 +97,27 @@ function ProductDetails() {
   const addProductToCart = () => {
     const p = resolvedProduct;
 
-    for (let i = 0; i < quantity; i++) {
-      addToCart({
-        id: p.id,
-        brand: p.brand,
-        title: p.title,
-        image: p.imageUrl,
-        price: p.price,
+    addToCart({
+      id: p.id,
+      brand: p.brand,
+      title: p.title,
+      image: p.imageUrl,
+      price: p.price,
+    }, quantity);
+  };
+
+  const toggleWishlist = async () => {
+    if (!id || wishlistLoading) return;
+    setWishlistLoading(true);
+    try {
+      const res = await API.post("/api/wishlist/toggle", null, {
+        params: { productId: id },
       });
+      setWishlisted(Boolean(res.data));
+    } catch (error) {
+      console.error("Failed to update wishlist:", error);
+    } finally {
+      setWishlistLoading(false);
     }
   };
 
@@ -99,7 +159,7 @@ function ProductDetails() {
             <FaStar />
             <FaStar />
             <FaStar />
-            <span>(125 Reviews)</span>
+            <span>({resolvedProduct.rating ? Number(resolvedProduct.rating).toFixed(1) : "0.0"} · {resolvedProduct.reviews || reviews.length} Reviews)</span>
           </div>
 
           <div className="price-section">
@@ -136,15 +196,19 @@ function ProductDetails() {
               Buy Now
             </button>
 
-            <button className="wishlist-btn-details">
+            <button
+              className={`wishlist-btn-details ${wishlisted ? "active" : ""}`}
+              onClick={toggleWishlist}
+              disabled={wishlistLoading}
+            >
               <FaHeart />
-              Wishlist
+              {wishlistLoading ? "Saving..." : wishlisted ? "Wishlisted" : "Wishlist"}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Description Section */}
+      <section className="reviews-section">\n        <h2>Customer Reviews</h2>\n        <form onSubmit={submitReview} className="review-form">\n          <label>Rating</label>\n          <select value={reviewRating} onChange={(e) => setReviewRating(Number(e.target.value))}>\n            <option value={5}>5 - Excellent</option><option value={4}>4 - Good</option><option value={3}>3 - Average</option><option value={2}>2 - Poor</option><option value={1}>1 - Very poor</option>\n          </select>\n          <textarea value={reviewComment} onChange={(e) => setReviewComment(e.target.value)} minLength={3} maxLength={2000} placeholder="Share your experience..." required />\n          <button type="submit" disabled={reviewLoading}>{reviewLoading ? "Saving..." : myReview ? "Update Review" : "Submit Review"}</button>\n        </form>\n        <div className="reviews-list">\n          {reviews.length === 0 ? <p>No reviews yet. Be the first to review this product.</p> : reviews.map((review) => (\n            <article key={review.id} className="review-item">\n              <strong>{review.userName || "Customer"}</strong>\n              <div>{"★".repeat(review.rating)}{"☆".repeat(5 - review.rating)}</div>\n              <p>{review.comment}</p>\n            </article>\n          ))}\n        </div>\n      </section>\n\n      {/* Description Section */}
       <div className="description-section">
         <h2>Product Description</h2>
         <p>
