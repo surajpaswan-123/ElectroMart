@@ -21,13 +21,15 @@ const STATUS_STYLES = {
     className: "mo-badge mo-badge--shipped",
   },
 
-  Delivered: {
-    className: "mo-badge mo-badge--delivered",
-  },
+  OUT_FOR_DELIVERY: { className: "mo-badge mo-badge--shipped" },
+  DELIVERED: { className: "mo-badge mo-badge--delivered" },
+  CANCELLED: { className: "mo-badge mo-badge--cancelled" },
 };
 function MyOrders() {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
+  const [returnReason, setReturnReason] = useState({});
+  const [returnMessage, setReturnMessage] = useState({});
 
   useEffect(() => {
     let isMounted = true;
@@ -92,6 +94,17 @@ function MyOrders() {
       };
     });
   }, [orders]);
+
+  const requestReturn = async (orderId) => {
+    const reason = returnReason[orderId] || "";
+    if (reason.trim().length < 3) return setReturnMessage((m) => ({...m, [orderId]: "Please enter a return reason."}));
+    try {
+      await API.post(`/api/returns/orders/${orderId}`, { reason });
+      setReturnMessage((m) => ({...m, [orderId]: "Return request submitted."}));
+    } catch (e) {
+      setReturnMessage((m) => ({...m, [orderId]: e.response?.data?.message || "Unable to submit return request."}));
+    }
+  };
 
   return (
     <div className="my-orders-page">
@@ -196,14 +209,18 @@ function MyOrders() {
                     </div>
                   </div>
 
+                  {String(order.status).toUpperCase() === "DELIVERED" && (
+                    <div className="mo-return-box">
+                      <input placeholder="Return reason" value={returnReason[order.raw.id] || ""} onChange={(e) => setReturnReason((m) => ({...m, [order.raw.id]: e.target.value}))} />
+                      <button type="button" onClick={() => requestReturn(order.raw.id)}>Request Return</button>
+                      {returnMessage[order.raw.id] && <small>{returnMessage[order.raw.id]}</small>}
+                    </div>
+                  )}
                   <div className="mo-card-actions">
                     <button
                       className="mo-action mo-action--track"
                       type="button"
-                      onClick={() => {
-                        // Hook for tracking page
-                        navigate("/order-confirmation");
-                      }}
+                      onClick={() => navigate("/order-confirmation", { state: { order: order.raw } })}
                     >
                       <FaTruck />
                       Track Order
@@ -212,10 +229,7 @@ function MyOrders() {
                     <button
                       className="mo-action mo-action--details"
                       type="button"
-                      onClick={() => {
-                        // Hook for details page
-                        navigate("/order-confirmation");
-                      }}
+                      onClick={() => navigate("/order-confirmation", { state: { order: order.raw } })}
                     >
                       <FaEye />
                       View Details
