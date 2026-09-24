@@ -97,15 +97,13 @@ function ProductDetails() {
   const addProductToCart = () => {
     const p = resolvedProduct;
 
-    for (let i = 0; i < quantity; i++) {
-      addToCart({
-        id: p.id,
-        brand: p.brand,
-        title: p.title,
-        image: p.imageUrl,
-        price: p.price,
-      });
-    }
+    addToCart({
+      id: p.id,
+      brand: p.brand,
+      title: p.title,
+      image: p.imageUrl,
+      price: p.price,
+    }, quantity);
   };
 
   const toggleWishlist = async () => {
@@ -198,9 +196,13 @@ function ProductDetails() {
               Buy Now
             </button>
 
-            <button className="wishlist-btn-details">
+            <button
+              className={`wishlist-btn-details ${wishlisted ? "active" : ""}`}
+              onClick={toggleWishlist}
+              disabled={wishlistLoading}
+            >
               <FaHeart />
-              Wishlist
+              {wishlistLoading ? "Saving..." : wishlisted ? "Wishlisted" : "Wishlist"}
             </button>
           </div>
         </div>
