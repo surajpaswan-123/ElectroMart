@@ -12,7 +12,6 @@ import About from "../pages/About/About";
 import Contact from "../pages/Contact/Contact";
 import OrderConfirmation from "../pages/OrderConfirmation/OrderConfirmation";
 import MyOrders from "../pages/MyOrders/MyOrders";
-import VerifyOTP from "../pages/VerifyOTP";
 
 import Layout from "../components/Layout/Layout";
 import ProtectedRoute from "../components/ProtectedRoute/ProtectedRoute";
@@ -30,7 +29,6 @@ function AppRoutes() {
         <Route path="/checkout" element={<ProtectedRoute>  <Checkout /></ProtectedRoute>}/>
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/verify-otp" element={<VerifyOTP />} />
 <Route
   path="/order-confirmation"
   element={
