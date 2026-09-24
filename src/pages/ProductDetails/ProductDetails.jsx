@@ -11,6 +11,8 @@ function ProductDetails() {
 
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
+  const [wishlisted, setWishlisted] = useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   const { addToCart, buyNow } = useCart();
 
@@ -24,6 +26,13 @@ function ProductDetails() {
       .catch(() => {
         setProduct(null);
       });
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    API.get(`/api/wishlist/check/${id}`)
+      .then((res) => setWishlisted(Boolean(res.data)))
+      .catch(() => setWishlisted(false));
   }, [id]);
 
   const increaseQty = () => {
@@ -58,6 +67,21 @@ function ProductDetails() {
         image: p.imageUrl,
         price: p.price,
       });
+    }
+  };
+
+  const toggleWishlist = async () => {
+    if (!id || wishlistLoading) return;
+    setWishlistLoading(true);
+    try {
+      const res = await API.post("/api/wishlist/toggle", null, {
+        params: { productId: id },
+      });
+      setWishlisted(Boolean(res.data));
+    } catch (error) {
+      console.error("Failed to update wishlist:", error);
+    } finally {
+      setWishlistLoading(false);
     }
   };
 
