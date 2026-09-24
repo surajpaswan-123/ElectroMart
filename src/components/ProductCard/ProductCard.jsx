@@ -28,6 +28,7 @@ function ProductCard({
   const navigate = useNavigate();
 const [wishlisted, setWishlisted] = useState(false);
   const [quickViewOpen, setQuickViewOpen] = React.useState(false);
+  const [wishlistLoading, setWishlistLoading] = useState(false);
 
   const product = {
     id,
