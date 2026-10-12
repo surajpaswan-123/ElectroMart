@@ -9,34 +9,27 @@ function Categories() {
   const categories = [
     {
       id: 101,
-      price: 49999,
       title: "Smartphones",
       products: 250,
       image:
         "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=800",
     },
-
     {
       id: 102,
-      price: 49999,
       title: "Laptops",
       products: 180,
       image:
         "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800",
     },
-
     {
       id: 103,
-      price: 49999,
       title: "Gaming",
       products: 120,
       image:
         "https://images.unsplash.com/photo-1593305841991-05c297ba4575?w=800",
     },
-
     {
       id: 104,
-      price: 49999,
       title: "Audio",
       products: 300,
       image:
@@ -44,37 +37,44 @@ function Categories() {
     },
   ];
 
+  const openCategory = (title) => {
+    navigate(
+      `/products?category=${title.toLowerCase().replace(/\s+/g, "-")}`
+    );
+  };
+
   return (
     <section className="categories">
       <div className="section-header">
+        <div className="category-heading">
+          <span className="section-eyebrow">FIND YOUR NEXT FAVOURITE</span>
+          <h2>Shop by Category</h2>
+        </div>
 
-        <h2>Shop By Category</h2>
-
-        <button className="view-all-btn">
-          View All →
+        <button
+          className="view-all-btn"
+          type="button"
+          onClick={() => navigate("/products")}
+        >
+          View All <span aria-hidden="true">›</span>
         </button>
-
       </div>
 
       <div className="categories-grid">
         {categories.map((item) => (
-          <div
+          <button
+            className="category-item"
             key={item.id}
-            onClick={() =>
-              navigate(
-                `/products?category=${item.title
-                  .toLowerCase()
-                  .replace(/\s+/g, "-")}`
-              )
-            }
-            style={{ cursor: "pointer" }}
+            type="button"
+            onClick={() => openCategory(item.title)}
+            aria-label={`Shop ${item.title}`}
           >
             <CategoryCard
               title={item.title}
               products={item.products}
               image={item.image}
             />
-          </div>
+          </button>
         ))}
       </div>
     </section>
