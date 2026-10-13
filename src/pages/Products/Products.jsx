@@ -1,241 +1,195 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import {
+  FaThLarge,
+  FaMobileAlt,
+  FaLaptop,
+  FaHeadphones,
+  FaGamepad,
+  FaHome,
+  FaCamera,
+  FaTags,
+  FaPlug,
+} from "react-icons/fa";
 import ProductCard from "../../components/ProductCard/ProductCard";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import API from "../../api/Api";
 import "./Products.css";
 
+const categoryIcons = {
+  "All Products": FaThLarge,
+  Smartphones: FaMobileAlt,
+  Mobiles: FaMobileAlt,
+  Laptops: FaLaptop,
+  Audio: FaHeadphones,
+  Gaming: FaGamepad,
+  "Smart Home": FaHome,
+  Cameras: FaCamera,
+  Accessories: FaPlug,
+  Deals: FaTags,
+};
+
 function Products() {
   const location = useLocation();
- const [products, setProducts] =
-  useState([]);
-  const [selectedCategory, setSelectedCategory] =
-    useState("All Products");
-
+  const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [search, setSearch] = useState("");
-
-  const [sortOption, setSortOption] =
-    useState("Featured");
+  const [sortOption, setSortOption] = useState("Featured");
+  const [categories, setCategories] = useState(["All Products"]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(
-      location.search
-    );
-
-    // Category Read
+    const params = new URLSearchParams(location.search);
     const category = params.get("category");
-
-    if (category) {
-      const formattedCategory = category
-        .split("-")
-        .map(
-          (word) =>
-            word.charAt(0).toUpperCase() +
-            word.slice(1)
-        )
-        .join(" ");
-
-      setSelectedCategory(formattedCategory);
-    } else {
-      setSelectedCategory("All Products");
-    }
-
-    // Search Read
     const searchQuery = params.get("search");
 
-    if (searchQuery) {
-      setSearch(searchQuery);
-    } else {
-      setSearch("");
-    }
+    setSelectedCategory(
+      category
+        ? category.split("-").map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ")
+        : "All Products"
+    );
+    setSearch(searchQuery || "");
   }, [location.search]);
-
-  const [categories, setCategories] = useState(["All Products"]);
 
   useEffect(() => {
     API.get("/api/categories")
       .then((res) => {
         const names = Array.isArray(res.data)
-          ? res.data
-              .map((c) => c?.name)
-              .filter(Boolean)
+          ? res.data.map((category) => category?.name).filter(Boolean)
           : [];
-        setCategories(["All Products", ...names]);
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  }, []);
-
-  const filteredProducts =
-    products.filter(
-      (product) => {
-
-      const categoryMatch =
-        selectedCategory ===
-        "All Products"
-          ? true
-          : product.category?.name ===
-            selectedCategory;
-
-      const searchMatch =
-        product.title
-          .toLowerCase()
-          .includes(
-            search.toLowerCase()
-          ) ||
-        product.brand
-          .toLowerCase()
-          .includes(
-            search.toLowerCase()
-          );
-
-      return (
-        categoryMatch &&
-        searchMatch
-      );
-    }
-  );
-
-  if (
-    sortOption ===
-    "Price Low To High"
-  ) {
-    filteredProducts.sort(
-      (a, b) => a.price - b.price
-    );
-  }
-
-  if (
-    sortOption ===
-    "Price High To Low"
-  ) {
-    filteredProducts.sort(
-      (a, b) => b.price - a.price
-    );
-  }
-  useEffect(() => {
-    API.get("/api/products")
-      .then((response) => {
-        setProducts(Array.isArray(response.data) ? response.data : []);
+        setCategories(["All Products", ...names.filter((name) => name !== "All Products")]);
       })
       .catch((error) => {
-        console.error(error);
-        setProducts([]);
+        console.error("Unable to load categories:", error);
       });
   }, []);
+
+  useEffect(() => {
+    setLoading(true);
+    setLoadError(false);
+    API.get("/api/products")
+      .then((response) => {
+        if (!Array.isArray(response.data)) {
+          setProducts([]);
+          setLoadError(true);
+          return;
+        }
+        setProducts(response.data);
+      })
+      .catch((error) => {
+        console.error("Unable to load products:", error);
+        setProducts([]);
+        setLoadError(true);
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const normalizedSearch = search.trim().toLowerCase();
+  const filteredProducts = products.filter((product) => {
+    const categoryName = product.category?.name || product.category || "";
+    const categoryMatch =
+      selectedCategory === "All Products" ||
+      categoryName.toLowerCase() === selectedCategory.toLowerCase();
+    const title = (product.title || product.name || "").toLowerCase();
+    const brand = (product.brand || "").toLowerCase();
+    const searchMatch =
+      !normalizedSearch ||
+      title.includes(normalizedSearch) ||
+      brand.includes(normalizedSearch);
+    return categoryMatch && searchMatch;
+  });
+
+  const sortedProducts = [...filteredProducts];
+  if (sortOption === "Price Low To High") {
+    sortedProducts.sort((a, b) => Number(a.price) - Number(b.price));
+  } else if (sortOption === "Price High To Low") {
+    sortedProducts.sort((a, b) => Number(b.price) - Number(a.price));
+  }
+
+  const chooseCategory = (category) => {
+    setSelectedCategory(category);
+    if (category === "All Products") {
+      navigate("/products");
+    } else {
+      navigate(`/products?category=${encodeURIComponent(category.toLowerCase().replace(/\s+/g, "-"))}`);
+    }
+  };
 
   return (
     <div className="products-page">
-      <div className="breadcrumb">
-        Home / {selectedCategory}
-      </div>
-
-      <div className="products-layout">
-        <aside className="sidebar">
-          <h3>Category</h3>
-
-          <ul>
-            {categories.map(
-              (category) => (
-                <li
-                  key={category}
-                  className={
-                    selectedCategory ===
-                    category
-                      ? "active"
-                      : ""
-                  }
-                  onClick={() =>
-                    setSelectedCategory(
-                      category
-                    )
-                  }
-                  style={{
-                    cursor: "pointer",
-                  }}
-                >
-                  {category}
-                </li>
-              )
-            )}
-          </ul>
-        </aside>
-
-        <div className="products-content">
-          <div className="products-top">
-            <div>
-              <h1>
-                {selectedCategory}
-              </h1>
-
-              <p>
-                {
-                  filteredProducts.length
-                }{" "}
-                Products
-              </p>
-
-              <span className="filter-tag">
-                {selectedCategory}
-              </span>
-            </div>
-
-            <div
-              style={{
-                display: "flex",
-                gap: "15px",
-                alignItems:
-                  "center",
-              }}
+      <nav className="catalog-category-nav" aria-label="Product categories">
+        {categories.map((category) => {
+          const Icon = categoryIcons[category] || FaPlug;
+          return (
+            <button
+              type="button"
+              key={category}
+              className={`catalog-category-item ${selectedCategory === category ? "active" : ""}`}
+              onClick={() => chooseCategory(category)}
+              aria-pressed={selectedCategory === category}
             >
-              <SearchBar
-                search={search}
-                setSearch={setSearch}
-              />
+              <Icon aria-hidden="true" />
+              <span>{category}</span>
+            </button>
+          );
+        })}
+      </nav>
 
-              <select
-                value={sortOption}
-                onChange={(e) =>
-                  setSortOption(
-                    e.target.value
-                  )
-                }
-              >
-                <option>
-                  Featured
-                </option>
-
-                <option>
-                  Price Low To High
-                </option>
-
-                <option>
-                  Price High To Low
-                </option>
-              </select>
-            </div>
+      <section className="catalog-panel">
+        <div className="catalog-heading-row">
+          <div>
+            <p className="catalog-eyebrow">ELECTROMART STORE</p>
+            <h1>{selectedCategory}</h1>
+            <p className="catalog-subtitle">
+              {loading ? "Loading products..." : loadError ? "We couldn't connect to the product service." : `Discover products picked for you · ${sortedProducts.length} products`}
+            </p>
           </div>
-
-          <div className="products-grid">
-            {filteredProducts.length >
-            0 ? (
-              filteredProducts.map(
-                (product) => (
-                  <ProductCard
-                    key={product.id}
-                    {...product}
-                  />
-                )
-              )
-            ) : (
-              <div className="no-products">
-                No Products Found
-              </div>
-            )}
+          <div className="catalog-controls">
+            <SearchBar search={search} setSearch={setSearch} />
+            <label className="catalog-sort-label">
+              <span>Sort</span>
+              <select value={sortOption} onChange={(event) => setSortOption(event.target.value)}>
+                <option>Featured</option>
+                <option>Price Low To High</option>
+                <option>Price High To Low</option>
+              </select>
+            </label>
           </div>
         </div>
-      </div>
+
+        {selectedCategory !== "All Products" && (
+          <div className="catalog-active-filter">
+            <span>{selectedCategory}</span>
+            <button type="button" onClick={() => chooseCategory("All Products")} aria-label="Clear category filter">×</button>
+          </div>
+        )}
+
+        <div className="products-grid">
+          {loading ? (
+            <div className="catalog-message">Loading products…</div>
+          ) : loadError ? (
+            <div className="catalog-message">
+              <strong>Products are temporarily unavailable</strong>
+              <span>Check the backend/API connection and try again.</span>
+              <button type="button" onClick={() => window.location.reload()}>Retry</button>
+            </div>
+          ) : sortedProducts.length > 0 ? (
+            sortedProducts.map((product) => <ProductCard key={product.id} {...product} />)
+          ) : (
+            <div className="catalog-message">
+              <strong>No products found</strong>
+              <span>Try another category or search term.</span>
+              {(search || selectedCategory !== "All Products") && (
+                <button type="button" onClick={() => { setSearch(""); chooseCategory("All Products"); }}>
+                  Clear filters
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
