@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 
-import Home from "../pages/Home/Home";
 import Products from "../pages/Products/Products";
 import ProductDetails from "../pages/ProductDetails/ProductDetails";
 import Cart from "../pages/Cart/Cart";
@@ -22,7 +21,7 @@ function AppRoutes() {
     <Routes>
       <Route element={<Layout />}>
 
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Products />} />
 
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<ProductDetails />} />
