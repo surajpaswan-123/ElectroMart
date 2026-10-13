@@ -71,12 +71,35 @@ function Products() {
     setLoadError(false);
     API.get("/api/products")
       .then((response) => {
-        if (!Array.isArray(response.data)) {
+        // Accept the Spring Boot DTO array and common paginated/wrapped API shapes.
+        const payload = response.data;
+        const rows = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.content)
+            ? payload.content
+            : Array.isArray(payload?.data)
+              ? payload.data
+              : null;
+
+        if (!rows) {
+          console.error("Unexpected /api/products response shape:", payload);
           setProducts([]);
           setLoadError(true);
           return;
         }
-        setProducts(response.data);
+
+        // Normalize DB/API naming variants into the props ProductCard expects.
+        setProducts(rows.map((item) => ({
+          ...item,
+          id: item.id ?? item.productId,
+          title: item.title ?? item.name ?? "",
+          brand: item.brand ?? item.manufacturer ?? "",
+          image: item.image ?? item.imageUrl ?? item.image_url ?? "",
+          oldPrice: item.oldPrice ?? item.old_price ?? null,
+          category: item.category ?? (
+            item.categoryName ? { name: item.categoryName } : null
+          ),
+        })));
       })
       .catch((error) => {
         console.error("Unable to load products:", error);
